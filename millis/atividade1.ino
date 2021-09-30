@@ -4,8 +4,23 @@ int led2 = 5;
 unsigned long lastTime = 0;
 bool lastState = false;
 
+//Return true only if the button was pressed and it's not debounce effect.
+bool onClickedButton(int button) {
+  if(digitalRead(button)){
+    delay(50);
+    if(!digitalRead(button)){
+      delay(50);
+        if(!digitalRead(button)){
+          return true;
+        }
+    }
+  }
+
+  return false;
+}
+
+//Blinks the LED
 void ledBlink(int requestedTime) {
-  while(true){
     if((millis() - lastTime) > requestedTime && lastState == false){
       
       lastState = true;
@@ -19,7 +34,6 @@ void ledBlink(int requestedTime) {
       digitalWrite(led, LOW);
       lastTime = millis();
     }
-  }
 }
 
 void setup(){
@@ -28,14 +42,13 @@ void setup(){
 }
 
 void loop() {
-  if(digitalRead(button)){
+  if(onClickedButton(button)){ //If the button was pressed then enter a infinite loop to blink the LED.
 
-    delay(50);
-    if(!digitalRead(button)){
-      delay(50);
-
-      if(!digitalRead(button)){
-        ledBlink(500);
+    while(true){
+      ledBlink(500);
+      if(onClickedButton(button)){ //If the button was pressed again then turn the LED off and get out of the loop.
+        pinMode(led, LOW);
+        break;
       }
     }
   }
